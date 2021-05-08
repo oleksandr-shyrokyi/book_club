@@ -1,8 +1,39 @@
+import 'package:book_club/screens/home/home.dart';
 import 'package:book_club/screens/signup/signup.dart';
+import 'package:book_club/states/currentUser.dart';
 import 'package:book_club/widgets/ourContainer.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class OurLoginForm extends StatelessWidget {
+class OurLoginForm extends StatefulWidget {
+  @override
+  _OurLoginFormState createState() => _OurLoginFormState();
+}
+
+class _OurLoginFormState extends State<OurLoginForm> {
+  /// TextEditing controllers
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  /// Methods
+  void loginUser(
+      String inEmail, String inPassword, BuildContext inContext) async {
+    CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
+    try {
+      if (await _currentUser.loginUser(inEmail, inPassword)) {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => HomeScreen()));
+      } else {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text("Incorrect Login info!"),
+          duration: Duration(seconds: 2),
+        )); // showSnackBar(
+      } // else
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return OurContainer(
@@ -26,6 +57,7 @@ class OurLoginForm extends StatelessWidget {
 
           /// Email input.
           TextFormField(
+            controller: _emailController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.alternate_email),
               hintText: "Email",
@@ -37,6 +69,7 @@ class OurLoginForm extends StatelessWidget {
 
           /// Password input.
           TextFormField(
+            controller: _passwordController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.lock_outlined),
               hintText: "Password",
@@ -62,7 +95,10 @@ class OurLoginForm extends StatelessWidget {
                 ),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              loginUser(
+                  _emailController.text, _passwordController.text, context);
+            }, // onPressed:
           ),
 
           /// Sing up Button.

@@ -1,7 +1,34 @@
+import 'package:book_club/states/currentUser.dart';
 import 'package:book_club/widgets/ourContainer.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class OurSignUpForm extends StatelessWidget {
+class OurSignUpForm extends StatefulWidget {
+  @override
+  _OurSignUpFormState createState() => _OurSignUpFormState();
+}
+
+class _OurSignUpFormState extends State<OurSignUpForm> {
+  /// TextEditingControllers
+  TextEditingController _fullNameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _confirmPasswordController = TextEditingController();
+
+  /// Methods
+  void _signUpUser(
+      String inEmail, String inPassword, BuildContext inContext) async {
+    CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
+
+    try {
+      if (await _currentUser.singUpUser(inEmail, inPassword)) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return OurContainer(
@@ -25,6 +52,7 @@ class OurSignUpForm extends StatelessWidget {
 
           /// FullName input.
           TextFormField(
+            controller: _fullNameController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.person_outline),
               hintText: "Full Name",
@@ -36,6 +64,7 @@ class OurSignUpForm extends StatelessWidget {
 
           /// Email input.
           TextFormField(
+            controller: _emailController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.alternate_email),
               hintText: "Email",
@@ -47,6 +76,7 @@ class OurSignUpForm extends StatelessWidget {
 
           /// Password input.
           TextFormField(
+            controller: _passwordController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.lock_outlined),
               hintText: "Password",
@@ -59,6 +89,7 @@ class OurSignUpForm extends StatelessWidget {
 
           /// Confirm Password input.
           TextFormField(
+            controller: _confirmPasswordController,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.lock_open),
               hintText: "Confirm Password",
@@ -84,7 +115,20 @@ class OurSignUpForm extends StatelessWidget {
                 ),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              /// if password and conf.pass are equal
+              if (_passwordController.text == _confirmPasswordController.text) {
+                _signUpUser(
+                    _emailController.text, _passwordController.text, context);
+              } else {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Passwords do not match"),
+                    duration: Duration(seconds: 2),
+                  )
+                ); // showSnackBar(
+              } // else
+            }, // onPressed:
           ),
         ],
       ),
