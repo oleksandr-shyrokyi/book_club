@@ -21,8 +21,14 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
     CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
 
     try {
-      if (await _currentUser.singUpUser(inEmail, inPassword)) {
+      String _returnString = await _currentUser.singUpUser(inEmail, inPassword);
+      if (_returnString == "success") {
         Navigator.pop(context);
+      } else {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(_returnString),
+          duration: Duration(seconds: 2),
+        ));
       }
     } catch (e) {
       print(e);
@@ -121,12 +127,10 @@ class _OurSignUpFormState extends State<OurSignUpForm> {
                 _signUpUser(
                     _emailController.text, _passwordController.text, context);
               } else {
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Passwords do not match"),
-                    duration: Duration(seconds: 2),
-                  )
-                ); // showSnackBar(
+                Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text("Passwords do not match"),
+                  duration: Duration(seconds: 2),
+                )); // showSnackBar(
               } // else
             }, // onPressed:
           ),

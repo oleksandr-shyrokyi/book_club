@@ -12,17 +12,15 @@ class CurrentUser extends ChangeNotifier {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Signs up a user and returns status being signed up
-  Future<bool> singUpUser(String inEmail, String inPassword) async {
-    bool retVal = false;
+  Future<String> singUpUser(String inEmail, String inPassword) async {
+    String retVal = "error";
 
     try {
-      AuthResult _authResult = await _auth.createUserWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
           email: inEmail, password: inPassword);
-      if (_authResult.user != null) {
-        retVal = true;
-      }
+      retVal = "success";
     } catch (e) {
-      print(e);
+      retVal = e.message;
     }
 
     return retVal;
@@ -30,19 +28,17 @@ class CurrentUser extends ChangeNotifier {
 
   /// Loges in user with his email and password. Returns status, and sets
   /// CurrentUser uid and email to AuthResult.user fields
-  Future<bool> loginUser(String inEmail, String inPassword) async {
-    bool retVal = false;
+  Future<String> loginUserWithEmail(String inEmail, String inPassword) async {
+    String retVal = "error";
 
     try {
       AuthResult _authResult = await _auth.signInWithEmailAndPassword(
           email: inEmail, password: inPassword);
-      if (_authResult.user != null) {
-        _uid = _authResult.user.uid;
-        _email = _authResult.user.email;
-        retVal = true;
-      }
+      _uid = _authResult.user.uid;
+      _email = _authResult.user.email;
+      retVal = "success";
     } catch (e) {
-      print(e);
+      retVal = e.message;
     }
 
     return retVal;
