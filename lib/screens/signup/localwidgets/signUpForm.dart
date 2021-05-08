@@ -1,8 +1,7 @@
-import 'package:book_club/screens/signup/signup.dart';
 import 'package:book_club/widgets/ourContainer.dart';
 import 'package:flutter/material.dart';
 
-class OurLoginForm extends StatelessWidget {
+class OurSignUpForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OurContainer(
@@ -15,13 +14,24 @@ class OurLoginForm extends StatelessWidget {
               horizontal: 8.0,
             ),
             child: Text(
-              "Log In",
+              "Sign Up",
               style: TextStyle(
                 color: Theme.of(context).secondaryHeaderColor,
                 fontSize: 25.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+
+          /// FullName input.
+          TextFormField(
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.person_outline),
+              hintText: "Full Name",
+            ),
+          ),
+          SizedBox(
+            height: 20.0,
           ),
 
           /// Email input.
@@ -47,6 +57,18 @@ class OurLoginForm extends StatelessWidget {
             height: 20.0,
           ),
 
+          /// Confirm Password input.
+          TextFormField(
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.lock_open),
+              hintText: "Confirm Password",
+            ),
+            obscureText: true,
+          ),
+          SizedBox(
+            height: 20.0,
+          ),
+
           /// Log in Button.
           RaisedButton(
             child: Padding(
@@ -54,7 +76,7 @@ class OurLoginForm extends StatelessWidget {
                 horizontal: 100,
               ),
               child: Text(
-                "Log In",
+                "Sign Up",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -63,19 +85,6 @@ class OurLoginForm extends StatelessWidget {
               ),
             ),
             onPressed: () {},
-          ),
-
-          /// Sing up Button.
-          FlatButton(
-            child: Text("Don't have an account? Sing Up here"),
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => OurSingUp(),
-                ),
-              );
-            },
           ),
         ],
       ),

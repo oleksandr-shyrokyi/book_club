@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// We will use this container in diff. parts of our app
 class OurContainer extends StatelessWidget {
   final Widget child;
 
