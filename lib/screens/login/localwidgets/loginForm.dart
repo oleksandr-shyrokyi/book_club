@@ -5,6 +5,8 @@ import 'package:book_club/widgets/ourContainer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+enum LoginType { email, google }
+
 class OurLoginForm extends StatefulWidget {
   @override
   _OurLoginFormState createState() => _OurLoginFormState();
@@ -15,26 +17,90 @@ class _OurLoginFormState extends State<OurLoginForm> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
-  /// Methods
-  void loginUser(
-      String inEmail, String inPassword, BuildContext inContext) async {
+  /// ------------ Methods ----------------
 
+  /// Logs in a user according to a login type and checks the _returnString
+  /// value:
+  /// 1. if it "success" - navigates to HomeScreen
+  /// 2. other vice it shows snackbar with "error" or catch error message
+  void loginUser(
+      {@required LoginType inType,
+      String inEmail,
+      String inPassword,
+      BuildContext inContext}) async {
     CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
 
     try {
-      String _returnString = await _currentUser.loginUserWithEmail(inEmail, inPassword);
+      // Checks login type and switches the corresponding login method.
+      // Assigns login result to _returnString variable
+      String _returnString;
+      switch (inType) {
+        case LoginType.email:
+          _returnString =
+              await _currentUser.loginUserWithEmail(inEmail, inPassword);
+          break;
+
+        case LoginType.google:
+          _returnString = await _currentUser.loginUserWithGoogle();
+          break;
+
+        default:
+      }
+
+      // Checks the value of _returnString variable and navigates or shows
+      // error snackbar
       if (_returnString == "success") {
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => HomeScreen()));
       } else {
-        Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(_returnString),
-          duration: Duration(seconds: 2),
-        )); // showSnackBar(
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_returnString),
+            duration: Duration(seconds: 2),
+          ),
+        ); // showSnackBar
       } // else
     } catch (e) {
       print(e);
     }
+  }
+
+  Widget _googleButton() {
+    return OutlineButton(
+      splashColor: Colors.grey,
+      onPressed: () {
+        loginUser(inType: LoginType.google, inContext: context);
+      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+      highlightElevation: 0,
+      borderSide: BorderSide(color: Colors.grey),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            /// Google logo image.
+            Image(
+              image: AssetImage("assets/google_logo.png"),
+              height: 25,
+            ),
+
+            /// Button text
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                "Sing in with Google",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -87,7 +153,7 @@ class _OurLoginFormState extends State<OurLoginForm> {
           RaisedButton(
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: 100,
+                horizontal: 80,
               ),
               child: Text(
                 "Log In",
@@ -100,7 +166,10 @@ class _OurLoginFormState extends State<OurLoginForm> {
             ),
             onPressed: () {
               loginUser(
-                  _emailController.text, _passwordController.text, context);
+                  inType: LoginType.email,
+                  inEmail: _emailController.text,
+                  inPassword: _passwordController.text,
+                  inContext: context);
             }, // onPressed:
           ),
 
@@ -116,6 +185,9 @@ class _OurLoginFormState extends State<OurLoginForm> {
               );
             },
           ),
+
+          /// Google button
+          _googleButton(),
         ],
       ),
     );
