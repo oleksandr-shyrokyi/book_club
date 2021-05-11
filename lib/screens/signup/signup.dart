@@ -12,18 +12,15 @@ class OurSingUp extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: ListView(
-              padding: EdgeInsets.all(20.0),
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0,),
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 14.0),
-                      child: BackButton(color: Theme.of(context).secondaryHeaderColor,),
-                    ),
+                    BackButton(color: Theme.of(context).secondaryHeaderColor,),
                   ],
                 ),
-                SizedBox(height: 14.0),
+                SizedBox(height: 40.0),
                 OurSignUpForm(),
               ],
             ),
