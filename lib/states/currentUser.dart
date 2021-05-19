@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logger/logger.dart';
+
+var log = Logger(printer: PrettyPrinter());
 
 class CurrentUser extends ChangeNotifier {
   OurUser _currentUser = OurUser();
@@ -15,20 +18,27 @@ class CurrentUser extends ChangeNotifier {
   /// Gets the user from Firestore
   Future<String> onStartUp() async {
     String retVal = "error";
+    log.d("Calling CurrentUser.onStartUp");
 
     try {
       FirebaseUser _firebaseUser = await _auth.currentUser();
+      log.d(
+          "## CurrentUser.onStartUp(): _firebaseUser = ${_firebaseUser.email}");
+
       if (_firebaseUser != null) {
         _currentUser = await OurDatabase().getUserInfo(_firebaseUser.uid);
-        if(_currentUser != null) {
+        log.d(
+            "## CurrentUser.onStartUp(): _currentUser = ${_currentUser.fullName}");
+
+        if (_currentUser != null) {
           retVal = "success";
         }
       }
-
     } catch (e) {
       print(e);
     }
-
+    log.d(
+        "## CurrentUser.onStartUp(): _firebaseUser = ${_currentUser.fullName}");
     return retVal;
   }
 

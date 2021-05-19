@@ -1,3 +1,5 @@
+import 'package:book_club/screens/createGroup/createGroup.dart';
+import 'package:book_club/screens/joinGroup/joinGroup.dart';
 import 'package:flutter/material.dart';
 
 class OurNoGroup extends StatelessWidget {
@@ -6,15 +8,18 @@ class OurNoGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// Joins a already created group
-    void _goToJoin() {}
+    void _goToJoin(BuildContext inContext) {
+      Navigator.push(
+          inContext, MaterialPageRoute(builder: (inContext) => OurJoinGroup()));
+    }
 
     /// Crates a group
-    void _goToCreate() {}
+    void _goToCreate(BuildContext inContext) {
+      Navigator.push(inContext,
+          MaterialPageRoute(builder: (inContext) => OurCreateGroup()));
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-      ),
       body: Column(
         children: [
           /// Logo Image
@@ -62,7 +67,7 @@ class OurNoGroup extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 RaisedButton(
-                  onPressed: () => _goToCreate(),
+                  onPressed: () => _goToCreate(context),
                   child: Text("Create"),
                   color: Theme.of(context).canvasColor,
                   shape: RoundedRectangleBorder(
@@ -73,7 +78,7 @@ class OurNoGroup extends StatelessWidget {
                   ),
                 ),
                 RaisedButton(
-                  onPressed: () => _goToJoin(),
+                  onPressed: () => _goToJoin(context),
                   child: Text("Join", style: TextStyle(color: Colors.white)),
                 )
               ],
