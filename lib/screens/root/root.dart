@@ -2,6 +2,7 @@ import 'package:book_club/screens/home/home.dart';
 import 'package:book_club/screens/login/login.dart';
 import 'package:book_club/screens/noGroup/noGroup.dart';
 import 'package:book_club/screens/splashScreen/splashScrenn.dart';
+import 'package:book_club/states/currentGroup.dart';
 import 'package:book_club/states/currentUser.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -72,7 +73,10 @@ class _OurRootState extends State<OurRoot> {
         break;
       // if we logged in and have a group we have a Home (inGroup) screen
       case AuthStatus.inGroup:
-        retVal = HomeScreen();
+        retVal = ChangeNotifierProvider(
+          create: (context) => CurrentGroup(),
+          child: HomeScreen(),
+        );
         break;
 
       default:

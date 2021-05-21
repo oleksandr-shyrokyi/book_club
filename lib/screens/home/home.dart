@@ -1,11 +1,37 @@
 import 'package:book_club/screens/noGroup/noGroup.dart';
 import 'package:book_club/screens/root/root.dart';
+import 'package:book_club/states/currentGroup.dart';
 import 'package:book_club/states/currentUser.dart';
 import 'package:book_club/widgets/ourContainer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:logger/logger.dart';
 
-class HomeScreen extends StatelessWidget {
+var log = Logger();
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    /// Gets current user, takes the groupId and updates current group due to the groupId
+    CurrentUser _currentUser = Provider.of<CurrentUser>(context, listen: false);
+    log.d(
+        "HomeScreenState.initState(): _currentUser <= ${_currentUser.getCurrentUser.fullName}");
+    CurrentGroup _currentGroup =
+        Provider.of<CurrentGroup>(context, listen: false);
+    log.d(
+        "HomeScreenState.initState(): _currentGroup <= ${_currentGroup.getCurrentGroup.name}");
+    _currentGroup.updateStateFromDatabase(_currentUser.getCurrentUser.groupId);
+    log.d(
+        "HomeScreenState.initState(): updated _currentGroup <= ${_currentGroup.getCurrentGroup.name}");
+  }
+
   /// Navigates to noGroup screen
   void _goToNoGroup(BuildContext inContext) {
     Navigator.push(
@@ -38,39 +64,49 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: OurContainer(
-              child: Column(
-                children: [
-                  Text(
-                    "Harry Potter and the Sorcerer's Stone",
-                    style: TextStyle(fontSize: 30, color: Colors.grey[600]),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          "Due in: ",
-                          style:
-                              TextStyle(fontSize: 30, color: Colors.grey[600]),
-                        ),
-                        Text(
-                          "8 Days",
-                          style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  RaisedButton(
-                    onPressed: () {},
-                    child: Text(
-                      "Finished Book",
-                      style: TextStyle(
-                        color: Colors.white,
+              child: Consumer<CurrentGroup>(
+                builder: (BuildContext context, value, Widget child) {
+                  return Column(
+                    children: [
+                      Text(
+                        value.getCurrentBook.name ?? "loading...",
+                        style: TextStyle(fontSize: 30, color: Colors.grey[600]),
                       ),
-                    ),
-                  ),
-                ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Due in: ",
+                              style: TextStyle(
+                                  fontSize: 30, color: Colors.grey[600]),
+                            ),
+                            Expanded(
+                              child: Text(
+                                (value.getCurrentGroup.currentBookDue != null)
+                                    ? value.getCurrentGroup.currentBookDue
+                                        .toDate()
+                                        .toString()
+                                    : "loading...",
+                                style: TextStyle(
+                                    fontSize: 30, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      RaisedButton(
+                        onPressed: () {},
+                        child: Text(
+                          "Finished Book",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),

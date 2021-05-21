@@ -1,4 +1,3 @@
-import 'package:book_club/screens/home/home.dart';
 import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/screens/signup/signup.dart';
 import 'package:book_club/states/currentUser.dart';
