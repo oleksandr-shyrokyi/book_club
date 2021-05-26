@@ -18,14 +18,14 @@ class CurrentUser extends ChangeNotifier {
   /// Gets the user from Firestore
   Future<String> onStartUp() async {
     String retVal = "error";
+
     log.d("Calling CurrentUser.onStartUp");
+    log.d("_currentUser = ${_currentUser.fullName}");
 
     try {
       FirebaseUser _firebaseUser = await _auth.currentUser();
-      log.d(
-          "## CurrentUser.onStartUp(): _firebaseUser = ${_firebaseUser.email}");
-
       if (_firebaseUser != null) {
+        log.d("_firebaseUser = ${_firebaseUser.uid}");
         _currentUser = await OurDatabase().getUserInfo(_firebaseUser.uid);
         log.d(
             "## CurrentUser.onStartUp(): _currentUser = ${_currentUser.fullName}");
@@ -37,8 +37,7 @@ class CurrentUser extends ChangeNotifier {
     } catch (e) {
       print(e);
     }
-    log.d(
-        "## CurrentUser.onStartUp(): _firebaseUser = ${_currentUser.fullName}");
+    log.d("## CurrentUser.onStartUp(): retVal = $retVal");
     return retVal;
   }
 

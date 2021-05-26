@@ -1,4 +1,4 @@
-import 'package:book_club/screens/noGroup/noGroup.dart';
+import 'package:book_club/screens/addBook/addBook.dart';
 import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/states/currentGroup.dart';
 import 'package:book_club/states/currentUser.dart';
@@ -33,10 +33,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Navigates to noGroup screen
-  void _goToNoGroup(BuildContext inContext) {
+  void _goToAddBook(BuildContext inContext) {
     Navigator.push(
       inContext,
-      MaterialPageRoute(builder: (inContext) => OurNoGroup()),
+      MaterialPageRoute(
+        builder: (inContext) => OurAddBook(
+          onGroupCreation: false,
+        ),
+      ),
     );
   }
 
@@ -57,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListView(
         children: <Widget>[
           SizedBox(
-            height: 8,
+            height: 20.0,
           ),
 
           /// 1st Container
@@ -142,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
               vertical: 20.0,
             ),
             child: RaisedButton(
-              onPressed: () => _goToNoGroup(context),
+              onPressed: () => _goToAddBook(context),
               child: Text("Book Club History",
                   style: TextStyle(color: Colors.white)),
             ),

@@ -27,6 +27,8 @@ dependencies:
   provider:
   google_sign_in:
   cloud_firestore:
+  intl:
+  flutter_datetime_picker:
   # logger
   logger:
 
