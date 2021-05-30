@@ -210,4 +210,55 @@ class OurDatabase {
     /// Returns Future<OurBook> instance filled with the data from Firestore
     return retVal;
   }
+
+  /// Sets the book rating and review to book finished
+  Future<String> finishedBook(
+    String inBookId,
+    String inGroupId,
+    String inUid,
+    int inRating,
+    String inReview,
+  ) async {
+    String retVal = "error";
+    try {
+      await _firestore
+          .collection("groups")
+          .document(inGroupId)
+          .collection("books")
+          .document(inBookId)
+          .collection("reviews")
+          .document(inUid)
+          .setData({
+        "rating": inRating,
+        "review": inReview,
+      });
+      retVal = "success";
+    } catch (error) {
+      log.e(error);
+    }
+
+    return retVal;
+  }
+
+  /// Figures out if the user ended up with passed book
+  Future<bool> ifUserDoneWithBook(
+      String inGroupId, String inBookId, String inUid) async {
+    bool retVal = false;
+    try {
+      DocumentSnapshot _docSnapshot = await _firestore
+          .collection("groups")
+          .document(inGroupId)
+          .collection("books")
+          .document(inBookId)
+          .collection("reviews")
+          .document(inUid)
+          .get();
+      if (_docSnapshot.exists) {
+        retVal = true;
+      }
+    } catch (error) {
+      log.e(error);
+    }
+    return retVal;
+  }
 }

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:book_club/screens/addBook/addBook.dart';
+import 'package:book_club/screens/review/review.dart';
 import 'package:book_club/screens/root/root.dart';
 import 'package:book_club/states/currentGroup.dart';
 import 'package:book_club/states/currentUser.dart';
+import 'package:book_club/utils/timeLeft.dart';
 import 'package:book_club/widgets/ourContainer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +19,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  /// [0] - time until the book is due; [1] - time until the book is revealed
+  List<String> _timeUntil = List(2);
+  Timer _timer;
+
+  /// Starts timer and changes _timeUntil[Due,Revealed] state values simultaneously
+  /// Takes _currentGroup instance to reach _currentBookDue field
+  /// The callback waits for next timer value and reacts to it, calling .timeLeft() method
+  void _startTimer(CurrentGroup inCurrentGroup) {
+    _timer = Timer.periodic(Duration(seconds: 1), (inTimer) {
+      setState(() {
+        /// .toDate() converts to DateTime, as currentBookDue is of Timestamp type
+        _timeUntil = OurTimeLeft()
+            .timeLeft(inCurrentGroup.getCurrentGroup.currentBookDue.toDate());
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -27,9 +48,21 @@ class _HomeScreenState extends State<HomeScreen> {
         Provider.of<CurrentGroup>(context, listen: false);
     log.d(
         "HomeScreenState.initState(): _currentGroup <= ${_currentGroup.getCurrentGroup.name}");
-    _currentGroup.updateStateFromDatabase(_currentUser.getCurrentUser.groupId);
+    _currentGroup.updateStateFromDatabase(
+        _currentUser.getCurrentUser.groupId, _currentUser.getCurrentUser.uid);
     log.d(
         "HomeScreenState.initState(): updated _currentGroup <= ${_currentGroup.getCurrentGroup.name}");
+
+    /// Calls the start timer to pass it a _currentGroup instance
+    _startTimer(_currentGroup);
+  }
+
+  /// We start time on .initState() but we have to dispose(избавляться) it as well
+  /// if we leave the screen the timer stops running
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   /// Navigates to noGroup screen
@@ -39,6 +72,23 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (inContext) => OurAddBook(
           onGroupCreation: false,
+        ),
+      ),
+    );
+  }
+
+  void _goToReview(BuildContext inContext) {
+    /// Initialises the current group from Provider
+    CurrentGroup _currentGroup = Provider.of<CurrentGroup>(
+      context,
+      listen: false,
+    );
+    Navigator.push(
+      inContext,
+      MaterialPageRoute(
+        builder: (inContext) => OurReview(
+          // Passes the _currentGroup to OurReview.currentGroup field
+          currentGroup: _currentGroup,
         ),
       ),
     );
@@ -87,11 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             Expanded(
                               child: Text(
-                                (value.getCurrentGroup.currentBookDue != null)
-                                    ? value.getCurrentGroup.currentBookDue
-                                        .toDate()
-                                        .toString()
-                                    : "loading...",
+                                /// takes the first value of _timeUntil
+                                _timeUntil[0] ?? "loading...",
                                 style: TextStyle(
                                     fontSize: 30, fontWeight: FontWeight.bold),
                               ),
@@ -100,13 +147,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       RaisedButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Finished Book",
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
+                        onPressed: () => value.getDoneWithCurrentBook
+                            ? null
+                            : _goToReview(context),
+                        child: value.getDoneWithCurrentBook
+                            ? Text(
+                                "Finished book!",
+                                style: TextStyle(
+                                  color: Colors.green[200],
+                                ),
+                              )
+                            : Text(
+                                "Finish Book",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ],
                   );
@@ -121,15 +177,16 @@ class _HomeScreenState extends State<HomeScreen> {
             child: OurContainer(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Next Book Revealed In: ",
+                      "Next Book\nRevealed In: ",
                       style: TextStyle(fontSize: 30, color: Colors.grey[600]),
                     ),
                     Text(
-                      "22 Hours",
+                      /// takes the second value of _timeUntil
+                      _timeUntil[1] ?? "loading...",
                       style:
                           TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                     ),
